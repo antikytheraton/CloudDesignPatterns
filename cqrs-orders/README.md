@@ -5,12 +5,12 @@
 ### Structure
 
 ```
-domain/         → entities, errors, events, OrderState (no dependencies)
-eventstore/     → append-only log              (depends on: domain)
-readmodel/      → projection + query store     (depends on: domain)
-commands/       → intent structs + handler     (depends on: domain, eventstore)
-queries/        → query structs + handler      (depends on: domain, readmodel)
-cmd/main.go     → composition root             (depends on: everything)
+domain/     → entities, errors, events
+eventstore/ → append-only log
+eventbus/   → async pub/sub between write and read sides
+readmodel/  → projection, updated via bus subscription
+commands/   → publishes to bus
+queries/    → pure reads
 ```
 
 

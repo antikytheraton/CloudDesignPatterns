@@ -11,7 +11,7 @@ const (
 )
 
 // Order is our aggregate - the central business object.
-// Notice it has No db tags, No JSON tags, No infra concerns
+// Notice it has No DB tags, No JSON tags, No infra concerns
 // It's pure business logic
 type Order struct {
 	ID         string
@@ -22,12 +22,12 @@ type Order struct {
 }
 
 // OrderState is the minimal state the handler needs to enforce rules.
-// it's not the read model view - it's just enough to anser invariant questions
+// it's not the read model view - it's just enough to answer invariant questions
 type OrderState struct {
 	Status OrderStatus
 }
 
-// Domain errors live here too - ther're part of the business language
+// Domain errors live here too - they're part of the business language
 var (
 	ErrNotFound         = errors.New("order not found")
 	ErrInvalidInput     = errors.New("invalid input")

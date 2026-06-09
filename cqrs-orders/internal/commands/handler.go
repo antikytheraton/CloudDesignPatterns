@@ -13,19 +13,19 @@ type OrderReader interface {
 	GetByID(id string) (*domain.OrderState, bool)
 }
 
-// Add a Projector to the Handler struct
-type Projector interface {
-	Apply(e domain.Event)
+// Add a Publisher to the Handler struct
+type Publisher interface {
+	Publish(e domain.Event)
 }
 
 type Handler struct {
 	store     *eventstore.Store
 	orders    OrderReader
-	projector Projector
+	publisher Publisher
 }
 
-func NewHandler(store *eventstore.Store, orders OrderReader, projector Projector) *Handler {
-	return &Handler{store: store, orders: orders, projector: projector}
+func NewHandler(store *eventstore.Store, orders OrderReader, publisher Publisher) *Handler {
+	return &Handler{store: store, orders: orders, publisher: publisher}
 }
 
 func (h *Handler) HandlePlaceOrder(cmd PlaceOrder) error {
@@ -98,5 +98,5 @@ func (h *Handler) HandleCancelOrder(cmd CancelOrder) error {
 // (Kafka, NATS, RabitMQ) so async consumers can update their own projections
 func (h *Handler) emit(e domain.Event) {
 	h.store.Append(e)
-	h.projector.Apply(e)
+	h.publisher.Publish(e)
 }

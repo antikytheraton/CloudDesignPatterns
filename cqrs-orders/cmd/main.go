@@ -3,6 +3,7 @@ package main
 import (
 	"cqrs-orders/internal/commands"
 	"cqrs-orders/internal/domain"
+	"cqrs-orders/internal/eventbus"
 	"cqrs-orders/internal/eventstore"
 	"cqrs-orders/internal/queries"
 	"cqrs-orders/internal/readmodel"
@@ -12,11 +13,16 @@ import (
 
 func main() {
 	// --- composition root ---
-	// This is the only place that knows about all layers.
-	// Everything else only knows about its immediate dependencies.
 	store := eventstore.New()
 	orderStore := readmodel.NewOrderStore()
-	cmdHandler := commands.NewHandler(store, orderStore, orderStore)
+	bus := eventbus.New(100)
+
+	bus.Subscribe(orderStore.Apply)
+
+	bus.Start()
+	defer bus.Stop()
+
+	cmdHandler := commands.NewHandler(store, orderStore, bus)
 	qryHandler := queries.NewHandler(orderStore)
 
 	fmt.Printf("=== WRITE SIDE: Commands ===\n")
